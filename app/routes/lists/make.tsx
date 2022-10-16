@@ -86,21 +86,25 @@ export default function List() {
       <h1 className="p-4 text-3xl md:px-10 md:text-5xl">Make your list</h1>
       <div className="text-md z-10 space-y-6 px-4 md:px-10 md:text-2xl">
         <p>
-          List 3 - 5 gifts you would want, or maybe just things you're
-          interested in. This will help whoever draws you in the secret santa
-          get you a gift you might enjoy a little more
+          List 3 gifts you would want, or maybe just things you're interested
+          in. This will help whoever draws you in the secret santa get you a
+          gift you might enjoy a little more
         </p>
-        <p>
-          There is room to put 5 things, but you only need to put 3. Please try
-          to keep your gifts around $25.
+        <p className="text-sm font-light">
+          Please try to keep your gifts around $25.
         </p>
+        <img
+          src="/assets/santa.svg"
+          alt="santa"
+          className="w-1/2 mx-auto md:w-1/4"
+        />
       </div>
       <div>
         <Form method="post" className="z-10 space-y-6 px-4 md:px-10" noValidate>
           <div className="z-10 mt-5 space-y-2">
             <Input
               name="name"
-              placeholder="Who are you?"
+              placeholder="Your Name"
               type="text"
               error={
                 actionData?.errors?.name
@@ -142,16 +146,8 @@ export default function List() {
               }
               className="w-full rounded border border-gray-500 text-lg"
             />
-            <Input name="giftFour" placeholder="Gift 4" type="text" />
-
-            <Input name="giftFive" placeholder="Gift 5" type="text" />
           </div>
-          <div className="relative flex justify-end z-10">
-            <img
-              src="/assets/santa.svg"
-              alt="santa"
-              className="absolute top-[-140px] z-0 h-[150px] "
-            />
+          <div className="relative z-10 flex justify-end">
             <button className="mt-3 items-center justify-center rounded-md border border-transparent bg-red-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-blue-300 sm:px-8">
               Submit
             </button>

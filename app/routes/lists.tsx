@@ -3,6 +3,7 @@ import { Button } from "~/components/Button";
 import type { LinksFunction } from "@remix-run/node";
 import { intervalToDuration } from "date-fns";
 import { useEffect, useState } from "react";
+import { CountDown } from "~/components/Countdown";
 
 export const links: LinksFunction = () => {
   return [
@@ -15,86 +16,30 @@ export const links: LinksFunction = () => {
 };
 
 export default function Lists() {
-  const [countDown, setCountDown] = useState(
-    intervalToDuration({
-      start: new Date(),
-      end: new Date("12/25/2022"),
-    })
-  );
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountDown(
-        intervalToDuration({
-          start: new Date(),
-          end: new Date("12/25/2022"),
-        })
-      );
-    }, 1000);
-    return () => clearInterval(interval);
-  });
   return (
     <>
       <div id="lists" className="relative">
         <div className="w-full">
-          <div className="flex w-full items-center bg-red-500 py-5 ">
-            <img
-              src="/assets/Snowman.svg"
-              alt="Snowman"
-              className="w-1/6 md:w-1/12"
-            />
-            {/* <h1 className="mx-5 text-2xl font-bold text-white md:text-5xl">
+          <div className="bg-red-500 py-5 ">
+            <div className="flex items-center">
+              <img
+                src="/assets/Snowman.svg"
+                alt="Snowman"
+                className="w-1/6 md:w-1/12"
+              />
+              {/* <h1 className="mx-5 text-2xl font-bold text-white md:text-5xl">
               Lists
             </h1> */}
-            <Button>
-              <Link to="/lists/make">Make Your List</Link>
-            </Button>
-            <Button>
-              <Link to="/lists/view">View Lists</Link>
-            </Button>
-            <div className="hidden space-x-1 md:flex">
-              {countDown.months && countDown.months > 0 && (
-                <div className="flex flex-col items-center rounded-md bg-white p-3 text-red-500">
-                  <p className="text-2xl font-bold">
-                    {countDown.months.toString().length === 1
-                      ? countDown.months.toString().padStart(2, "0")
-                      : countDown.months}
-                  </p>
-                  <p className="text-sm font-light">Months</p>
-                </div>
-              )}
-              {countDown.days && countDown.days > 0 && (
-                <div className="flex flex-col items-center rounded-md bg-white p-3 text-red-500">
-                  <p className="text-2xl font-bold">
-                    {countDown.days.toString().length === 1
-                      ? countDown.days.toString().padStart(2, "0")
-                      : countDown.days}
-                  </p>
-                  <p className="text-sm font-light">Days</p>
-                </div>
-              )}
-              {countDown.minutes && countDown.minutes > 0 && (
-                <div className="flex flex-col items-center rounded-md bg-white p-3 text-red-500">
-                  <p className="text-2xl font-bold">
-                    {countDown.minutes.toString().length < 2
-                      ? countDown.minutes.toString().padStart(2, "0")
-                      : countDown.minutes}
-                  </p>
-                  <p className="text-sm font-light">Minutes</p>
-                </div>
-              )}
-              {countDown.seconds && (
-                <div className="flex flex-col items-center rounded-md bg-white p-3 text-red-500">
-                  <p className="text-2xl font-bold">
-                    {countDown.seconds.toString().length < 2
-                      ? countDown.seconds.toString().padStart(2, "0")
-                      : countDown.seconds}
-                  </p>
-                  <p className="text-sm font-light">Seconds</p>
-                </div>
-              )}
+              <Button>
+                <Link to="/lists/make">Make Your List</Link>
+              </Button>
+              <Button>
+                <Link to="/lists/view">View Lists</Link>
+              </Button>
             </div>
           </div>
           <div className="container mx-auto">
+            <CountDown />
             <Outlet />
           </div>
         </div>
