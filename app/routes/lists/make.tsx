@@ -88,8 +88,7 @@ export default function List() {
       <div className="text-md z-10 space-y-6 px-4 md:px-10 md:text-2xl">
         <p>
           List 3 gifts you would want, or maybe just things you're interested
-          in. This will help whoever draws you in the secret santa get you a
-          gift you might enjoy a little more
+          in. This will help your secret santa make your christmas merry!
         </p>
         <p className="text-sm font-light">
           Please try to keep your gifts around $25.

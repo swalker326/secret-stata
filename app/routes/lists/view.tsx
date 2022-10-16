@@ -3,15 +3,15 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import React, { useEffect, useState } from "react";
 import { getLists } from "~/models/list.server";
-import { requireUserId } from "~/session.server";
+import { requireUser } from "~/session.server";
 
 export async function loader({ request, params }: LoaderArgs) {
-  await requireUserId(request);
+  const user = await requireUser(request);
   const lists = await getLists();
   if (!lists) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ lists });
+  return json({ lists, user });
 }
 export const meta: MetaFunction = () => {
   return {
@@ -20,7 +20,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function ViewLists() {
-  const { lists } = useLoaderData<typeof loader>();
+  const { lists, user } = useLoaderData<typeof loader>();
+  const isAdmin = user.email === 'admin@swalker.dev'
   const [columns, setColumns] = useState<{
     col1?: React.ReactNode[];
     col2?: React.ReactNode[];
@@ -31,6 +32,9 @@ export default function ViewLists() {
       (acc, list, index) => {
         const component: React.ReactNode = (
           <div className="py-2" key={list.id}>
+            {
+              isAdmin && <a href={`/lists/${list.id}`}>edit</a>
+            }
             <div className="rounded-md bg-slate-50 p-3 pl-5 drop-shadow-lg">
               <h2 className="text-2xl">
                 {list.name.charAt(0).toUpperCase() +
