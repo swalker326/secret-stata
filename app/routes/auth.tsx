@@ -1,4 +1,9 @@
-import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
+import type {
+  ActionArgs,
+  LinksFunction,
+  LoaderArgs,
+  MetaFunction,
+} from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useSearchParams } from "@remix-run/react";
 import { verifyLogin } from "~/models/user.server";
@@ -44,6 +49,16 @@ export const meta: MetaFunction = () => {
   return {
     title: "Login",
   };
+};
+
+export const links: LinksFunction = () => {
+  return [
+    {
+      rel: "icon",
+      href: "/assets/santa.svg",
+      type: "image/svg+xml",
+    },
+  ];
 };
 
 export default function Auth() {

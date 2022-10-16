@@ -75,7 +75,7 @@ export async function action({ request }: ActionArgs) {
 }
 export const meta: MetaFunction = () => {
   return {
-    title: "Gift List",
+    title: "Make Your List",
   };
 };
 

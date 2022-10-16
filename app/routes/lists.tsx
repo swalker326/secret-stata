@@ -1,6 +1,6 @@
 import { Link, Outlet } from "@remix-run/react";
 import { Button } from "~/components/Button";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import { CountDown } from "~/components/Countdown";
 
 export const links: LinksFunction = () => {
@@ -11,6 +11,11 @@ export const links: LinksFunction = () => {
       type: "image/svg+xml",
     },
   ];
+};
+export const meta: MetaFunction = () => {
+  return {
+    title: "Gift Lists",
+  };
 };
 
 export default function Lists() {
