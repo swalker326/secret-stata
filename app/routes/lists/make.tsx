@@ -6,6 +6,7 @@ import type {
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
+import { Button } from "~/components/Button";
 import { Input } from "~/components/Input";
 import { addList } from "~/models/list.server";
 import { requireUserId } from "~/session.server";
@@ -96,7 +97,7 @@ export default function List() {
         <img
           src="/assets/santa.svg"
           alt="santa"
-          className="w-1/2 mx-auto md:w-1/4"
+          className="mx-auto w-1/2 md:w-1/4"
         />
       </div>
       <div>
@@ -148,9 +149,9 @@ export default function List() {
             />
           </div>
           <div className="relative z-10 flex justify-end">
-            <button className="mt-3 items-center justify-center rounded-md border border-transparent bg-red-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-blue-300 sm:px-8">
+            <Button type="submit" variant="red">
               Submit
-            </button>
+            </Button>
           </div>
         </Form>
       </div>
