@@ -67,25 +67,27 @@ export default function ViewLists() {
     setColumns(columnsObj);
   }, [lists]);
   return (
-    <div className="flex flex-wrap text-red-500">
-      <div className="md:flex">
-        <div className="w-1/1 flex flex-col px-2 md:w-1/3">
+    <div className="text-red-500">
+      <div className="flex flex-col md:flex-row">
+        <div className="w-full flex-col px-2 md:w-1/3">
           {columns?.col1 && columns.col1.map((c) => c)}
         </div>
-        <div className="w-1/1 flex flex-col px-2 md:w-1/3">
+        <div className="flex w-full flex-col px-2 md:w-1/3">
           {columns?.col2 && columns.col2.map((c) => c)}
         </div>
-        <div className="w-1/1 flex flex-col px-2 md:w-1/3">
+        <div className="flex w-full flex-col px-2 md:w-1/3">
           {columns?.col3 && columns.col3.map((c) => c)}
         </div>
       </div>
-      {!columns?.col1 && !columns?.col2 && !columns?.col3 && (
-        <div className="mx-2 w-full rounded-md bg-white p-3 md:mx-0">
-          <h2 className="text-2xl">No lists yet</h2>
-          <p>
-            Lists will be populated here so you can see what the person you got
-            wants
-          </p>
+      {lists.length < 1 && (
+        <div className="w-full flex justify-center">
+          <div className="mx-2 rounded-md bg-white p-3">
+            <h2 className="text-2xl">No lists yet</h2>
+            <p>
+              Lists will be populated here so you can see what the person you
+              got wants
+            </p>
+          </div>
         </div>
       )}
     </div>
