@@ -62,7 +62,6 @@ export async function action({ request, params }: ActionArgs) {
     giftTwo.toString(),
     giftThree.toString(),
   ];
-  console.log("list :", list); ////eslint disable line ##DEBUG
   if (!user) {
     return json(
       {
@@ -78,7 +77,6 @@ export async function action({ request, params }: ActionArgs) {
     id: user.id,
     gifts: list,
   });
-  console.log("Updated users gifts");
   return json({ user, errors: { name: "", gifts: [""] }, status: 200 });
 }
 export const meta: MetaFunction = () => {
@@ -100,7 +98,6 @@ export default function UserDetails() {
   const { user, recipient } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const transition = useTransition();
-  console.log(user.listSubmitted);
 
   return (
     <div className="relative">
