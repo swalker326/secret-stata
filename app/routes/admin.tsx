@@ -1,3 +1,4 @@
+import type { LinksFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { LoaderArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
@@ -23,6 +24,16 @@ export async function loader({ request }: LoaderArgs) {
   );
   return json({ usersWithSantas }, { status: 200 });
 }
+
+export const links: LinksFunction = () => {
+  return [
+    {
+      rel: "icon",
+      href: "/assets/santa.svg",
+      type: "image/svg+xml",
+    },
+  ];
+};
 
 export default function Admin() {
   const { usersWithSantas } = useLoaderData<typeof loader>();
