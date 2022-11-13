@@ -10,16 +10,16 @@ import { prisma } from "~/db.server";
 
 installGlobals();
 
-async function deleteUser(email: string) {
-  if (!email) {
+async function deleteUser(name: string) {
+  if (!name) {
     throw new Error("email required for login");
   }
-  if (!email.endsWith("@example.com")) {
+  if (!name.endsWith("@example.com")) {
     throw new Error("All test emails must end in @example.com");
   }
 
   try {
-    await prisma.user.delete({ where: { email } });
+    await prisma.user.delete({ where: { name } });
   } catch (error) {
     if (
       error instanceof PrismaClientKnownRequestError &&

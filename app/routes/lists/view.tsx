@@ -2,16 +2,16 @@ import type { LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import React, { useEffect, useState } from "react";
-import { getLists } from "~/models/list.server";
+import { getAllLists } from "~/models/list.server";
 import { requireUser } from "~/session.server";
 
-export async function loader({ request, params }: LoaderArgs) {
+export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
-  const lists = await getLists();
-  if (!lists) {
+  const people = await getAllLists();
+  if (!people) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ lists, user });
+  return json({ people, user });
 }
 export const meta: MetaFunction = () => {
   return {
@@ -20,21 +20,19 @@ export const meta: MetaFunction = () => {
 };
 
 export default function ViewLists() {
-  const { lists, user } = useLoaderData<typeof loader>();
-  const isAdmin = user.email === 'admin@swalker.dev'
+  const { people, user } = useLoaderData<typeof loader>();
+  const isAdmin = user.name === "admin@swalker.dev";
   const [columns, setColumns] = useState<{
     col1?: React.ReactNode[];
     col2?: React.ReactNode[];
     col3?: React.ReactNode[];
   }>();
   useEffect(() => {
-    const columnsObj = lists.reduce(
+    const columnsObj = people.reduce(
       (acc, list, index) => {
         const component: React.ReactNode = (
           <div className="py-2" key={list.id}>
-            {
-              isAdmin && <a href={`/lists/${list.id}`}>edit</a>
-            }
+            {isAdmin && <a href={`/lists/${list.id}`}>edit</a>}
             <div className="rounded-md bg-slate-50 p-3 pl-5 drop-shadow-lg">
               <h2 className="text-2xl">
                 {list.name.charAt(0).toUpperCase() +
@@ -44,7 +42,7 @@ export default function ViewLists() {
                 <div className="flex-grow border-t border-gray-400"></div>
               </div>
               <ol className="ml-3 list-decimal">
-                {list.gifts.map((gift, i) => (
+                {list.items.map((gift, i) => (
                   <li key={i} className="m-1">
                     {gift}
                   </li>
@@ -69,7 +67,7 @@ export default function ViewLists() {
       }
     );
     setColumns(columnsObj);
-  }, [lists]);
+  }, [isAdmin, people]);
   return (
     <div className="text-red-500">
       <div className="flex flex-col md:flex-row">
@@ -83,8 +81,8 @@ export default function ViewLists() {
           {columns?.col3 && columns.col3.map((c) => c)}
         </div>
       </div>
-      {lists.length < 1 && (
-        <div className="w-full flex justify-center">
+      {people.length < 1 && (
+        <div className="flex w-full justify-center">
           <div className="mx-2 rounded-md bg-white p-3">
             <h2 className="text-2xl">No lists yet</h2>
             <p>

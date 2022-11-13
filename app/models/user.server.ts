@@ -6,19 +6,65 @@ import { prisma } from "~/db.server";
 export type { User } from "@prisma/client";
 
 export async function getUserById(id: User["id"]) {
-  return prisma.user.findUnique({ where: { id } });
+  return prisma.user.findUnique({ where: { id }, include: { gifts: true } });
+}
+export async function getUsers() {
+  return prisma.user.findMany();
 }
 
-export async function getUserByEmail(email: User["email"]) {
-  return prisma.user.findUnique({ where: { email } });
+export function getUsersWithoutGifts() {
+  return prisma.user.findMany({
+    where: { gifts: { items: { equals: [] } } },
+    select: { id: true, name: true, gifts: true },
+    orderBy: { updatedAt: "desc" },
+  });
 }
 
-export async function createUser(email: User["email"], password: string) {
+export function updateUserGifts({
+  id,
+  gifts,
+}: {
+  id: User["id"];
+  gifts: string[];
+}) {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      gifts: {
+        upsert: {
+          create: {
+            name: "list",
+            items: gifts,
+          },
+          update: {
+            items: gifts,
+          },
+        },
+      },
+    },
+  });
+}
+
+export async function getUserByName(name: User["name"]) {
+  return prisma.user.findUnique({ where: { name }, include: { gifts: true } });
+}
+
+export async function setUserSanta(
+  name: User["name"],
+  santaId: User["id"]
+): Promise<User> {
+  return prisma.user.update({
+    where: { name },
+    data: { santaId },
+  });
+}
+
+export async function createUser(name: User["name"], password: string) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   return prisma.user.create({
     data: {
-      email,
+      name,
       password: {
         create: {
           hash: hashedPassword,
@@ -28,18 +74,18 @@ export async function createUser(email: User["email"], password: string) {
   });
 }
 
-export async function deleteUserByEmail(email: User["email"]) {
-  return prisma.user.delete({ where: { email } });
+export async function deleteUserByname(name: User["name"]) {
+  return prisma.user.delete({ where: { name } });
 }
 
 export async function verifyLogin(
-  email: User["email"],
+  name: User["name"],
   password: Password["hash"]
 ) {
-  console.log("email :", email); //eslint disable line ##DEBUG
+  console.log("name :", name); //eslint disable line ##DEBUG
   console.log("password :", password); //eslint disable line ##DEBUG
   const userWithPassword = await prisma.user.findUnique({
-    where: { email },
+    where: { name },
     include: {
       password: true,
     },

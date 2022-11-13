@@ -1,11 +1,11 @@
 import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
+import { Form, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
 
 import { verifyLogin } from "~/models/user.server";
 import { createUserSession, getUserId } from "~/session.server";
-import { safeRedirect, validateEmail } from "~/utils";
+import { safeRedirect, validateUsername } from "~/utils";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await getUserId(request);
@@ -15,37 +15,37 @@ export async function loader({ request }: LoaderArgs) {
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
-  const email = formData.get("email");
+  const name = formData.get("name");
   const password = formData.get("password");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
   const remember = formData.get("remember");
 
-  if (!validateEmail(email)) {
+  if (!validateUsername(name)) {
     return json(
-      { errors: { email: "Email is invalid", password: null } },
+      { errors: { name: "Name is invalid", password: null } },
       { status: 400 }
     );
   }
 
   if (typeof password !== "string" || password.length === 0) {
     return json(
-      { errors: { password: "Password is required", email: null } },
+      { errors: { password: "Password is required", name: null } },
       { status: 400 }
     );
   }
 
   if (password.length < 8) {
     return json(
-      { errors: { password: "Password is too short", email: null } },
+      { errors: { password: "Password is too short", name: null } },
       { status: 400 }
     );
   }
 
-  const user = await verifyLogin(email, password);
+  const user = await verifyLogin(name, password);
 
   if (!user) {
     return json(
-      { errors: { email: "Invalid email or password", password: null } },
+      { errors: { name: "Invalid name or password", password: null } },
       { status: 400 }
     );
   }
@@ -68,12 +68,12 @@ export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/lists/view";
   const actionData = useActionData<typeof action>();
-  const emailRef = React.useRef<HTMLInputElement>(null);
+  const nameRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (actionData?.errors?.email) {
-      emailRef.current?.focus();
+    if (actionData?.errors?.name) {
+      nameRef.current?.focus();
     } else if (actionData?.errors?.password) {
       passwordRef.current?.focus();
     }
@@ -81,31 +81,31 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-full flex-col justify-center">
-      <div className="mx-auto w-full max-w-md px-8 bg-white p-3">
+      <div className="mx-auto w-full max-w-md bg-white p-3 px-8">
         <Form method="post" className="space-y-6" noValidate>
           <div>
             <label
-              htmlFor="email"
+              htmlFor="name"
               className="block text-sm font-medium text-gray-700"
             >
-              Email address
+              Name
             </label>
             <div className="mt-1">
               <input
-                ref={emailRef}
-                id="email"
+                ref={nameRef}
+                id="name"
                 required
                 autoFocus={true}
-                name="email"
-                type="email"
-                autoComplete="email"
-                aria-invalid={actionData?.errors?.email ? true : undefined}
-                aria-describedby="email-error"
+                name="name"
+                type="name"
+                autoComplete="name"
+                aria-invalid={actionData?.errors?.name ? true : undefined}
+                aria-describedby="name-error"
                 className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
               />
-              {actionData?.errors?.email && (
-                <div className="pt-1 text-red-700" id="email-error">
-                  {actionData.errors.email}
+              {actionData?.errors?.name && (
+                <div className="pt-1 text-red-700" id="name-error">
+                  {actionData.errors.name}
                 </div>
               )}
             </div>
@@ -144,34 +144,6 @@ export default function LoginPage() {
           >
             Log in
           </button>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember"
-                name="remember"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="remember"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
-            </div>
-            <div className="text-center text-sm text-gray-500">
-              Don't have an account?{" "}
-              <Link
-                className="text-blue-500 underline"
-                to={{
-                  pathname: "/join",
-                  search: searchParams.toString(),
-                }}
-              >
-                Sign up
-              </Link>
-            </div>
-          </div>
         </Form>
       </div>
     </div>

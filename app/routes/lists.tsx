@@ -1,7 +1,8 @@
-import { Link, Outlet } from "@remix-run/react";
+import { Form, Link, Outlet } from "@remix-run/react";
 import { Button } from "~/components/Button";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import { CountDown } from "~/components/Countdown";
+import { logout } from "~/session.server";
 
 export const links: LinksFunction = () => {
   return [
@@ -30,9 +31,6 @@ export default function Lists() {
                 alt="Snowman"
                 className="w-1/6 md:w-1/12"
               />
-              {/* <h1 className="mx-5 text-2xl font-bold text-white md:text-5xl">
-              Lists
-            </h1> */}
               <Button>
                 <Link to="/lists/make">Make Your List</Link>
               </Button>
@@ -40,6 +38,10 @@ export default function Lists() {
                 <Link to="/lists/view">View Lists</Link>
               </Button>
             </div>
+
+            <Form method="post" action="/logout">
+              <Button type="submit">Logout</Button>
+            </Form>
           </div>
           <div className="container mx-auto">
             <CountDown />

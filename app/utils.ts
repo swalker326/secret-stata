@@ -66,6 +66,6 @@ export function useUser(): User {
   return maybeUser;
 }
 
-export function validateEmail(email: unknown): email is string {
-  return typeof email === "string" && email.length > 3 && email.includes("@");
+export function validateUsername(name: unknown): name is string {
+  return typeof name === "string" && name.length > 2;
 }

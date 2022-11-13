@@ -1,4 +1,8 @@
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import {
+  createCookie,
+  createCookieSessionStorage,
+  redirect,
+} from "@remix-run/node";
 import invariant from "tiny-invariant";
 
 import type { User } from "~/models/user.server";
@@ -76,13 +80,38 @@ export async function createUserSession({
 }) {
   const session = await getSession(request);
   session.set(USER_SESSION_KEY, userId);
+  const headers = new Headers();
+  headers.append(
+    "Set-Cookie",
+    await sessionStorage.commitSession(session, {
+      maxAge: remember
+        ? 60 * 60 * 24 * 60 // 2 months
+        : undefined,
+    })
+  );
+  return redirect(redirectTo, {
+    headers,
+  });
+}
+export async function createPersonCookie({
+  request,
+  personId,
+  redirectTo,
+}: {
+  request: Request;
+  personId: string;
+  redirectTo: string;
+}) {
+  const session = await getSession(request);
+  session.set("personId", personId);
+
+  const personCookie = createCookie(`personId=${personId}`, {
+    maxAge: 60 * 60 * 24 * 60,
+  });
+  console.log("Created person cookie");
   return redirect(redirectTo, {
     headers: {
-      "Set-Cookie": await sessionStorage.commitSession(session, {
-        maxAge: remember
-          ? 60 * 60 * 24 * 7 // 7 days
-          : undefined,
-      }),
+      "Set-Cookie": await personCookie.serialize("personId"),
     },
   });
 }
