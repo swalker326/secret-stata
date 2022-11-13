@@ -13,7 +13,7 @@ import * as React from "react";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await getUserId(request);
-  if (userId) return redirect(`/${userId}`);
+  if (userId) return redirect(`/user`);
   return json({});
 }
 
