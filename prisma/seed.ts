@@ -4,30 +4,64 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function seed() {
-  const email = "shane@swalker.dev";
+  const generatePassword = (name: string) => {
+    const password = `${name}123`;
+    return bcrypt.hash(password, 10);
+  };
+  const name = "shane@swalker.dev";
   const admin = "admin@swalker.dev";
+  const hashedAdminPassword = await bcrypt.hash("adminadmin1!", 10);
+  const users = await [
+    { name: "Anthony", password: await generatePassword("Anthony") },
+    { name: "Bobe", password: await generatePassword("Bobe") },
+    { name: "David", password: await generatePassword("David") },
+    { name: "Jack", password: await generatePassword("Jack") },
+    { name: "Jen", password: await generatePassword("Jen") },
+    { name: "Jill", password: await generatePassword("Jill") },
+    { name: "Joanie", password: await generatePassword("Joanie") },
+    { name: "Jon", password: await generatePassword("Jon") },
+    { name: "Jori", password: await generatePassword("Jori") },
+    { name: "Katie", password: await generatePassword("Katie") },
+    { name: "Liz", password: await generatePassword("Liz") },
+    { name: "Marcy", password: await generatePassword("Marcy") },
+    { name: "Mark", password: await generatePassword("Mark") },
+    { name: "Nancy", password: await generatePassword("Nancy") },
+    { name: "Shane", password: await generatePassword("Shane") },
+    { name: "Shon", password: await generatePassword("Shon") },
+  ];
 
   // cleanup the existing database
-  await prisma.user.delete({ where: { email } }).catch(() => {
+  await prisma.user.delete({ where: { name } }).catch(() => {
     // no worries if it doesn't exist yet
   });
 
-  const hashedPassword = await bcrypt.hash("christmas2022yay", 10);
-  const hashedAdminPassword = await bcrypt.hash("adminadmin1!", 10);
+  // const hashedPassword = await bcrypt.hash("christmas2022yay", 10);
+  const generateSantas = () => {
+    const shuffledUsers = users.sort(() => 0.5 - Math.random());
+    return shuffledUsers.map((user, index) => ({
+      ...user,
+      santa: users[index + 1]?.name || users[0]?.name,
+    }));
+  };
+  const usersWithSantas = generateSantas();
+  console.log(usersWithSantas);
+  console.log("Creating users...");
 
-  await prisma.user.create({
-    data: {
-      email,
-      password: {
-        create: {
-          hash: hashedPassword,
+  for (let user of users) {
+    await prisma.user.create({
+      data: {
+        name: user.name,
+        password: {
+          create: {
+            hash: await user.password,
+          },
         },
       },
-    },
-  });
+    });
+  }
   await prisma.user.create({
     data: {
-      email: admin,
+      name: admin,
       password: {
         create: {
           hash: hashedAdminPassword,
@@ -35,6 +69,33 @@ async function seed() {
       },
     },
   });
+  console.log("Admin created.", "Creating assignments..."); //eslint disable line ##DEBUG
+
+  Promise.all(
+    usersWithSantas.map(async ({ name, santa }) => {
+      const santaUser = await prisma.user.findUnique({
+        where: { name: santa },
+      });
+      const user = await prisma.user.findUnique({ where: { name } });
+      try {
+        await prisma.user.update({
+          where: { name },
+          data: {
+            santaId: santaUser?.id,
+          },
+        });
+        await prisma.user.update({
+          where: { name: santa },
+          data: {
+            recipientId: user?.id,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    })
+  );
+  console.log("Assignments created."); //eslint disable line ##DEBUG
 
   console.log(`Database has been seeded. 🌱`);
 }
