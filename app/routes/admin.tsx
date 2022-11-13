@@ -17,9 +17,13 @@ export async function loader({ request }: LoaderArgs) {
   invariant(users, "Something went wrong, we can't find any users");
   const usersWithSantas = await Promise.all(
     users.map(async (user) => {
-      if (!user.santaId) return { ...user, santa: null };
+      if (!user.santaId) return { ...user, santa: null, recipient: null };
+      if (!user.recipientId) return { ...user, santa: null, recipient: null };
       const santa = await getUserById(user.santaId);
-      return santa ? { ...user, santa } : { ...user, santa: null };
+      const recipient = await getUserById(user.recipientId);
+      return santa
+        ? { ...user, santa, recipient }
+        : { ...user, santa: null, recipient: null };
     })
   );
   return json({ usersWithSantas }, { status: 200 });
@@ -65,16 +69,22 @@ export default function Admin() {
         <div className="flex w-full flex-wrap">
           {usersWithSantas
             .sort((a, b) => (a.name > b.name ? 1 : -1))
-            .map(({ santa, name, id, gifts }) => {
+            .map(({ santa, name, id, gifts, recipient }) => {
               return (
-                <div key={id} className="w-1/3">
-                  <div className="m-2 rounded-md bg-gray-100 p-2">
+                <div key={id} className="w-full md:w-1/3">
+                  <div className="m-2 rounded-md bg-gray-100 p-2 font-normal">
                     <div className="p-1 text-xl underline">
                       <Link to={`/${id}`}>{name}</Link>
                     </div>
                     <div className="p-1">
-                      <strong className="font-light">Santa:</strong>{" "}
-                      {santa?.name}
+                      <p>
+                        is buying for <strong>{recipient?.name}</strong>
+                      </p>
+                    </div>
+                    <div className="p-1">
+                      <p>
+                        is getting a gift from <strong>{santa?.name}</strong>
+                      </p>
                     </div>
                     {gifts?.items && gifts.items.length > 0 ? (
                       <ul className="list-disc">

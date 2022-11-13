@@ -25,16 +25,14 @@ export async function loader({ request, params }: LoaderArgs) {
   invariant(params.userId, "no id found");
   const user = await getUserById(params.userId);
   invariant(user, "user not found");
-  invariant(user.santaId, "user has no santa");
-  console.log(user.id);
-  console.log(loggedInUser?.id);
+  invariant(user.recipientId, "user has no santa");
   if (
     loggedInUser.name !== "admin@swalker.dev"
   ) {
     throw new Error("You are not authorized to view this page");
   }
-  const santa = await getUserById(user.santaId);
-  return json({ user, santa });
+  const recipient = await getUserById(user.recipientId);
+  return json({ user, recipient });
 }
 
 export async function action({ request }: ActionArgs) {
@@ -98,7 +96,7 @@ export const links: LinksFunction = () => {
 };
 
 export default function UserDetails() {
-  const { user, santa } = useLoaderData<typeof loader>();
+  const { user,  recipient } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const transition = useTransition();
   console.log(user.listSubmitted);
@@ -122,14 +120,14 @@ export default function UserDetails() {
       <div className="m-6 rounded bg-white p-4">
         <h1 className="text-3xl font-bold">Hi {user.name}</h1>
         <p className="py-3">
-          You're <strong>{santa?.name}'s</strong> secret santa
+          You're <strong>{recipient?.name}'s</strong> secret santa
         </p>
-        {santa?.gifts?.items.length ? (
+        {recipient?.gifts?.items.length ? (
           <div>
             <h3 className="text-2xl md:text-2xl">
-              Gift ideas for {santa?.name}:
+              Gift ideas for {recipient?.name}:
             </h3>
-            {santa?.gifts?.items.map((gift, index) => {
+            {recipient?.gifts?.items.map((gift, index) => {
               return (
                 <div key={index} className="flex flex-col">
                   <p>{gift}</p>
@@ -138,7 +136,7 @@ export default function UserDetails() {
             })}
           </div>
         ) : (
-          <p>{santa?.name} has not submitted their gift list</p>
+          <p>{recipient?.name} has not submitted their gift list</p>
         )}
 
         <div className="my-6">

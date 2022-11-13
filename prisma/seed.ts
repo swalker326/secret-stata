@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { getUsers } from "~/models/user.server";
 
 const prisma = new PrismaClient();
 
@@ -30,6 +31,11 @@ async function seed() {
     { name: "Shon", password: await generatePassword("Shon") },
   ];
 
+  const sample = [
+    { name: "Shane", santa: "Anthony", recipient: "Bobe" },
+    { name: "Anthony", santa: "Bobe", recipient: "Shane" },
+    { name: "Bobe", santa: "Shane", recipient: "Anthony" },
+  ];
   // cleanup the existing database
   await prisma.user.delete({ where: { name } }).catch(() => {
     // no worries if it doesn't exist yet
@@ -71,7 +77,8 @@ async function seed() {
   });
   console.log("Admin created.", "Creating assignments..."); //eslint disable line ##DEBUG
 
-  Promise.all(
+  // Set the santa for each user
+  await Promise.all(
     usersWithSantas.map(async ({ name, santa }) => {
       const santaUser = await prisma.user.findUnique({
         where: { name: santa },
@@ -95,6 +102,19 @@ async function seed() {
       }
     })
   );
+  getUsers().then((users) => {
+    console.log(users);
+    Promise.all(
+      users.map((user) => {
+        const recipient = users.find((u) => u.id === user.santaId);
+        console.log(`${user.name} is buying for ${recipient?.name}`);
+        prisma.user.update({
+          where: { id: user.id },
+          data: { recipientId: recipient?.id },
+        });
+      })
+    );
+  });
   console.log("Assignments created."); //eslint disable line ##DEBUG
 
   console.log(`Database has been seeded. 🌱`);

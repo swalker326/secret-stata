@@ -98,7 +98,7 @@ export default function Auth() {
         </h1>
       </div>
       <div className="flex justify-center p-5">
-        <div className="w-1/2 rounded-md bg-white p-10">
+        <div className="md:w-1/2 rounded-md bg-white p-10">
           <Form method="post" className="space-y-6" noValidate>
             <div>
               <label

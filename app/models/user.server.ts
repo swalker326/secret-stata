@@ -10,7 +10,13 @@ export async function getUserById(id: User["id"]) {
 }
 export async function getUsers() {
   return prisma.user.findMany({
-    select: { gifts: true, santaId: true, name: true, id: true },
+    select: {
+      gifts: true,
+      santaId: true,
+      name: true,
+      id: true,
+      recipientId: true,
+    },
   });
 }
 
