@@ -63,34 +63,37 @@ export default function Admin() {
           Recipients: {new Set(usersWithSantas.filter((u) => u.santa)).size}
         </h3>
         <div className="flex w-full flex-wrap">
-          {usersWithSantas.map(({ santa, name, id, gifts }) => {
-            return (
-              <div key={id} className="w-1/3">
-                <div className="bg-gray-100 m-2 p-2 rounded-md">
-                  <div className="p-1 text-xl underline">
-                    <Link to={`/${id}`}>{name}</Link>
+          {usersWithSantas
+            .sort((a, b) => (a.name > b.name ? 1 : -1))
+            .map(({ santa, name, id, gifts }) => {
+              return (
+                <div key={id} className="w-1/3">
+                  <div className="m-2 rounded-md bg-gray-100 p-2">
+                    <div className="p-1 text-xl underline">
+                      <Link to={`/${id}`}>{name}</Link>
+                    </div>
+                    <div className="p-1">
+                      <strong className="font-light">Santa:</strong>{" "}
+                      {santa?.name}
+                    </div>
+                    {gifts?.items && gifts.items.length > 0 ? (
+                      <ul className="list-disc">
+                        <h2 className="p-1 font-bold">Gifts</h2>
+                        {gifts?.items.map((gift, index) => {
+                          return (
+                            <li className="ml-4" key={index}>
+                              {gift}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <div className="p-1">No gifts yet</div>
+                    )}
                   </div>
-                  <div className="p-1">
-                    <strong className="font-light">Santa:</strong> {santa?.name}
-                  </div>
-                  {gifts?.items && gifts.items.length > 0 ? (
-                    <ul className="list-disc">
-                      <h2 className="p-1 font-bold">Gifts</h2>
-                      {gifts?.items.map((gift, index) => {
-                        return (
-                          <li className="ml-4" key={index}>
-                            {gift}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  ) : (
-                    <div className="p-1">No gifts yet</div>
-                  )}
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
           {/* {usersWithSantas
               // .filter((users) => users.)
               .map(({ name, santa, id }) => (
