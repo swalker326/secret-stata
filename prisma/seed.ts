@@ -30,12 +30,6 @@ async function seed() {
     { name: "Shane", password: await generatePassword("Shane") },
     { name: "Shon", password: await generatePassword("Shon") },
   ];
-
-  const sample = [
-    { name: "Shane", santa: "Anthony", recipient: "Bobe" },
-    { name: "Anthony", santa: "Bobe", recipient: "Shane" },
-    { name: "Bobe", santa: "Shane", recipient: "Anthony" },
-  ];
   // cleanup the existing database
   await prisma.user.delete({ where: { name } }).catch(() => {
     // no worries if it doesn't exist yet
@@ -50,8 +44,6 @@ async function seed() {
     }));
   };
   const usersWithSantas = generateSantas();
-  console.log(usersWithSantas);
-  console.log("Creating users...");
 
   for (let user of users) {
     await prisma.user.create({
@@ -75,7 +67,6 @@ async function seed() {
       },
     },
   });
-  console.log("Admin created.", "Creating assignments..."); //eslint disable line ##DEBUG
 
   // Set the santa for each user
   await Promise.all(
@@ -103,7 +94,6 @@ async function seed() {
     })
   );
   getUsers().then((users) => {
-    console.log(users);
     Promise.all(
       users.map((user) => {
         const recipient = users.find((u) => u.id === user.santaId);
@@ -115,7 +105,6 @@ async function seed() {
       })
     );
   });
-  console.log("Assignments created."); //eslint disable line ##DEBUG
 
   console.log(`Database has been seeded. 🌱`);
 }
