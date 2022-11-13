@@ -36,7 +36,10 @@ export const links: LinksFunction = () => {
 };
 
 export default function Admin() {
-  const { usersWithSantas } = useLoaderData<typeof loader>();
+  const { usersWithSantas: users } = useLoaderData<typeof loader>();
+  const usersWithSantas = users.filter(
+    (user) => user.name !== "admin@swalker.dev"
+  );
   return (
     <div className="relative">
       <div className="bg-red-500 py-5 ">
@@ -53,21 +56,42 @@ export default function Admin() {
           </Form>
         </div>
       </div>
-      <div className=" mt-4 flex w-1/2 flex-col items-center rounded-lg bg-white p-6">
+      <div className=" mt-4 flex flex-col items-center rounded-lg bg-white p-6">
         <h1 className="text-5xl">Admin</h1>
         <h3>Santas: {new Set(usersWithSantas).size}</h3>
         <h3>
           Recipients: {new Set(usersWithSantas.filter((u) => u.santa)).size}
         </h3>
-        <div className="w-full">
-          <table>
-            <tr className="border-t-2 border-r-2 border-l-2 border-black p-1">
-              <th className="border-r-2 border-black text-left">Santa</th>
-              <th className="border-l-2 border-black p-1 text-left">
-                Recipient
-              </th>
-            </tr>
-            {usersWithSantas
+        <div className="flex w-full flex-wrap">
+          {usersWithSantas.map(({ santa, name, id, gifts }) => {
+            return (
+              <div key={id} className="w-1/3">
+                <div className="bg-gray-100 m-2 p-2 rounded-md">
+                  <div className="p-1 text-xl underline">
+                    <Link to={`/${id}`}>{name}</Link>
+                  </div>
+                  <div className="p-1">
+                    <strong className="font-light">Santa:</strong> {santa?.name}
+                  </div>
+                  {gifts?.items && gifts.items.length > 0 ? (
+                    <ul className="list-disc">
+                      <h2 className="p-1 font-bold">Gifts</h2>
+                      {gifts?.items.map((gift, index) => {
+                        return (
+                          <li className="ml-4" key={index}>
+                            {gift}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <div className="p-1">No gifts yet</div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          {/* {usersWithSantas
               // .filter((users) => users.)
               .map(({ name, santa, id }) => (
                 <tr key={name} className="border-2 border-black">
@@ -83,7 +107,7 @@ export default function Admin() {
                   </td>
                 </tr>
               ))}
-          </table>
+          </table> */}
         </div>
       </div>
     </div>

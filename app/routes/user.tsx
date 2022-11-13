@@ -19,20 +19,10 @@ import { Input } from "~/components/Input";
 import { getUserById, updateUserGifts } from "~/models/user.server";
 import { getUser } from "~/session.server";
 
-export async function loader({ request, params }: LoaderArgs) {
-  const loggedInUser = await getUser(request);
-  invariant(loggedInUser, "no user logged in");
-  invariant(params.userId, "no id found");
-  const user = await getUserById(params.userId);
+export async function loader({ request }: LoaderArgs) {
+  const user = await getUser(request);
   invariant(user, "user not found");
   invariant(user.santaId, "user has no santa");
-  console.log(user.id);
-  console.log(loggedInUser?.id);
-  if (
-    loggedInUser.name !== "admin@swalker.dev"
-  ) {
-    throw new Error("You are not authorized to view this page");
-  }
   const santa = await getUserById(user.santaId);
   return json({ user, santa });
 }

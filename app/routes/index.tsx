@@ -8,7 +8,7 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useSearchParams } from "@remix-run/react";
 import { verifyLogin } from "~/models/user.server";
 import { createUserSession, getUserId } from "~/session.server";
-import { safeRedirect, validateUsername } from "~/utils";
+import { validateUsername } from "~/utils";
 import * as React from "react";
 
 export async function loader({ request }: LoaderArgs) {
@@ -21,8 +21,6 @@ export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
   const name = formData.get("name");
   const password = formData.get("password");
-  const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
-  const remember = formData.get("remember");
 
   if (!validateUsername(name)) {
     return json(
@@ -53,13 +51,13 @@ export async function action({ request }: ActionArgs) {
       { status: 400 }
     );
   }
-  const isAdmin = user.name === 'admin@swalker.dev'
+  const isAdmin = user.name === "admin@swalker.dev";
 
   return createUserSession({
     request,
     userId: user.id,
-    remember: remember === "on" ? true : false,
-    redirectTo: user ? (isAdmin ? "/admin" : `/${user.id}`) : redirectTo,
+    remember: true,
+    redirectTo: isAdmin ? "/admin" : `/user`,
   });
 }
 
@@ -81,7 +79,7 @@ export const links: LinksFunction = () => {
 
 export default function Auth() {
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/lists/make";
+  const redirectTo = searchParams.get("redirectTo") || "/user";
   const actionData = useActionData<typeof action>();
   const passwordRef = React.useRef<HTMLInputElement>(null);
   const nameRef = React.useRef<HTMLInputElement>(null);

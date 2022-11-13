@@ -9,7 +9,9 @@ export async function getUserById(id: User["id"]) {
   return prisma.user.findUnique({ where: { id }, include: { gifts: true } });
 }
 export async function getUsers() {
-  return prisma.user.findMany();
+  return prisma.user.findMany({
+    select: { gifts: true, santaId: true, name: true, id: true },
+  });
 }
 
 export function getUsersWithoutGifts() {
@@ -30,6 +32,7 @@ export function updateUserGifts({
   return prisma.user.update({
     where: { id },
     data: {
+      listSubmitted: true,
       gifts: {
         upsert: {
           create: {
