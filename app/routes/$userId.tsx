@@ -26,18 +26,17 @@ export async function loader({ request, params }: LoaderArgs) {
   const user = await getUserById(params.userId);
   invariant(user, "user not found");
   invariant(user.recipientId, "user has no santa");
-  if (
-    loggedInUser.name !== "admin@swalker.dev"
-  ) {
+  if (loggedInUser.name !== "admin@swalker.dev") {
     throw new Error("You are not authorized to view this page");
   }
   const recipient = await getUserById(user.recipientId);
   return json({ user, recipient });
 }
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request, params }: ActionArgs) {
   const formData = await request.formData();
-  const user = await getUser(request);
+  invariant(params.userId, "no id found");
+  const user = await getUserById(params.userId);
   // const name = formData.get("name");
   const giftOne = formData.get("giftOne");
   const giftTwo = formData.get("giftTwo");
@@ -96,10 +95,9 @@ export const links: LinksFunction = () => {
 };
 
 export default function UserDetails() {
-  const { user,  recipient } = useLoaderData<typeof loader>();
+  const { user, recipient } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const transition = useTransition();
-  console.log(user.listSubmitted);
 
   return (
     <div className="relative">
@@ -151,7 +149,6 @@ export default function UserDetails() {
                 placeholder="Gift 1"
                 type="text"
                 defaultValue={user.gifts ? user.gifts?.items[0] : ""}
-                disabled={!!user.listSubmitted}
                 error={
                   actionData?.errors?.gifts?.includes("giftOne")
                     ? { message: "Please enter a gift", isError: true }
@@ -163,7 +160,6 @@ export default function UserDetails() {
                 placeholder="Gift 2"
                 type="text"
                 defaultValue={user.gifts ? user.gifts?.items[1] : ""}
-                disabled={!!user.listSubmitted}
                 error={
                   actionData?.errors?.gifts?.includes("giftTwo")
                     ? { message: "Please enter a gift", isError: true }
@@ -174,7 +170,6 @@ export default function UserDetails() {
                 name="giftThree"
                 placeholder="Gift 3"
                 type="text"
-                disabled={!!user.listSubmitted}
                 defaultValue={user.gifts ? user.gifts?.items[2] : ""}
                 error={
                   actionData?.errors?.gifts?.includes("giftThree")
@@ -185,11 +180,9 @@ export default function UserDetails() {
               />
             </div>
             <div className="relative z-10 flex justify-end">
-              {!user.listSubmitted && (
-                <Button type="submit" variant="red">
-                  {transition.state !== "idle" ? "Submitting..." : "Submit"}
-                </Button>
-              )}
+              <Button type="submit" variant="red">
+                {transition.state !== "idle" ? "Submitting..." : "Submit"}
+              </Button>
             </div>
           </Form>
         </div>
